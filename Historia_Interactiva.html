@@ -2,430 +2,423 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>SUPER-TILLA: EL CÓDIGO 3412</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TILLA // SYMBIONT</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;color:#00ff41;font-family:'Share Tech Mono',monospace;overflow-x:hidden;min-height:100vh;}
+  #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;opacity:0.13;z-index:0;pointer-events:none;}
+  .glitch-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.015) 2px,rgba(0,255,65,0.015) 4px);}
+  .scan-line{position:fixed;width:100%;height:3px;background:linear-gradient(transparent,#00ff4122,transparent);animation:scanline 8s linear infinite;z-index:1;pointer-events:none;}
+  @keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
+  #app{position:relative;z-index:2;max-width:420px;margin:0 auto;min-height:100vh;padding:0 0 40px;}
+  .page{display:none;animation:fadeIn .5s ease;}
+  .page.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-body{
-background:#000;
-color:#00ff00;
-font-family:'Courier New',monospace;
-margin:0;
-font-size:16px;
-overflow-x:hidden;
-}
+  /* COVER */
+  .cover{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center;}
+  .cover-logo{font-family:'Orbitron',monospace;font-size:76px;font-weight:900;color:#00ff41;text-shadow:0 0 30px #00ff41,0 0 60px #00ff41;letter-spacing:8px;animation:glitchText 3s infinite;line-height:1;}
+  @keyframes glitchText{0%,90%,100%{text-shadow:0 0 30px #00ff41,0 0 60px #00ff41;transform:none}91%{transform:skewX(-15deg);text-shadow:-3px 0 #ff0040,3px 0 #00cfff}93%{transform:none}96%{transform:skewX(-5deg);text-shadow:2px 0 #ff0040,-2px 0 #00cfff}97%{transform:none}}
+  .cover-sub{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:4px;color:#00cfff;margin:10px 0 5px;text-transform:uppercase;}
+  .monkey-art{font-size:100px;margin:25px 0;filter:drop-shadow(0 0 20px #00ff41);animation:float 3s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .cover-desc{font-size:12px;color:#888;line-height:1.8;margin:15px 0 30px;max-width:320px;border:1px solid #00ff4133;padding:15px;background:#00ff4108;}
+  .cover-desc span{color:#00ff41;}
+  .start-btn{background:transparent;border:2px solid #00ff41;color:#00ff41;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:3px;padding:16px 40px;cursor:pointer;text-transform:uppercase;position:relative;overflow:hidden;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 10px #00ff41}50%{box-shadow:0 0 25px #00ff41,0 0 50px #00ff4166}}
+  .start-btn:hover{background:#00ff4122;}
+  .blink{animation:blink 1s step-end infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-/* MATRIX FONDO */
+  /* STORY */
+  .story-page{padding:20px 18px;min-height:100vh;}
+  .page-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #00ff4144;padding-bottom:10px;margin-bottom:20px;}
+  .page-num{font-family:'Orbitron',monospace;font-size:10px;color:#00cfff;letter-spacing:2px;}
+  .page-title{font-family:'Orbitron',monospace;font-size:11px;color:#00ff41;letter-spacing:1px;text-align:right;max-width:200px;line-height:1.3;}
+  .progress-bar{height:3px;background:#00ff4133;margin-bottom:5px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#00ff41,#00cfff);transition:width 1s ease;box-shadow:0 0 8px #00ff41;}
+  .scene-emoji{font-size:70px;text-align:center;margin:15px 0;filter:drop-shadow(0 0 15px #00ff41);display:block;}
+  .story-text{font-size:13.5px;line-height:1.9;color:#ccc;margin:15px 0;}
+  .story-text .highlight{color:#00ff41;font-weight:bold;text-shadow:0 0 8px #00ff41;}
+  .story-text .char{color:#00cfff;font-style:italic;}
+  .story-text .danger{color:#ff0040;text-shadow:0 0 8px #ff0040;}
+  .story-text .symbiont{color:#b000ff;text-shadow:0 0 8px #b000ff;font-weight:bold;}
+  .terminal{background:#001a00;border:1px solid #00ff4166;border-left:3px solid #00ff41;padding:12px 15px;margin:15px 0;font-size:12px;color:#00ff41;position:relative;}
+  .terminal::before{content:'> SISTEMA //';font-size:9px;color:#00ff4188;letter-spacing:2px;display:block;margin-bottom:8px;}
+  .terminal.purple{background:#0d001a;border-color:#b000ff66;border-left-color:#b000ff;}
+  .terminal.purple::before{content:'> SIMBIONTE //';color:#b000ff88;}
+  .terminal.red{background:#1a0000;border-color:#ff004066;border-left-color:#ff0040;}
+  .terminal.red::before{content:'> ALERTA //';color:#ff004088;}
+  .char-tag{display:inline-block;background:#00cfff22;border:1px solid #00cfff55;color:#00cfff;font-size:10px;padding:2px 8px;margin:2px;letter-spacing:1px;}
+  .divider{border:none;border-top:1px solid #00ff4133;margin:20px 0;position:relative;}
+  .divider::after{content:'///';position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#000;padding:0 8px;color:#00ff4166;font-size:12px;}
+  .nav-btn{display:block;width:100%;background:transparent;border:2px solid #00ff41;color:#00ff41;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:2px;padding:15px;cursor:pointer;transition:all .3s;text-transform:uppercase;margin:20px 0 0;}
+  .nav-btn:hover{background:#00ff4122;box-shadow:0 0 20px #00ff4155;}
+  .nav-btn.secondary{border-color:#00cfff;color:#00cfff;font-size:11px;padding:12px;margin:10px 0 0;}
+  .nav-btn.secondary:hover{background:#00cfff22;}
 
-.matrix-bg{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-opacity:.3;
-pointer-events:none;
-}
+  /* FINAL */
+  .final-page{padding:30px 20px;text-align:center;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .final-title{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:#00ff41;text-shadow:0 0 30px #00ff41;letter-spacing:4px;margin:20px 0 10px;line-height:1.2;animation:glitchText 3s infinite;}
+  .credit{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#ff0040;text-shadow:0 0 15px #ff0040,0 0 30px #ff006688;letter-spacing:2px;margin:20px 0;padding:16px 20px;border:1px solid #ff004066;background:#1a000a;animation:creditPulse 2s infinite;line-height:1.6;text-align:center;}
+  @keyframes creditPulse{0%,100%{box-shadow:0 0 10px #ff004055}50%{box-shadow:0 0 25px #ff0040,0 0 50px #ff006644}}
 
-/* CONTENEDOR */
-
-.container{
-max-width:900px;
-margin:auto;
-padding:40px;
-padding-bottom:140px;
-border:1px solid #00ff00;
-background:rgba(0,20,0,.8);
-box-shadow:0 0 20px rgba(0,255,0,.2);
-}
-
-/* TITULOS */
-
-h1{
-text-align:center;
-text-shadow:0 0 10px #00ff00;
-border-bottom:2px solid #00ff00;
-padding-bottom:10px;
-}
-
-h2{
-color:#00ffff;
-text-align:center;
-border-bottom:1px dashed #00ffff;
-}
-
-/* PAGINAS */
-
-.page{
-display:none;
-animation:fadeIn .7s;
-}
-
-.page.active{
-display:block;
-}
-
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1;transform:translateY(0)}
-}
-
-/* TEXTO */
-
-p{
-line-height:1.6;
-font-size:1.1rem;
-margin-bottom:20px;
-text-align:justify;
-}
-
-/* REPARTO */
-
-.cast-section{
-background:rgba(0,255,0,.1);
-padding:20px;
-border-radius:5px;
-margin:20px 0;
-border:1px solid #004400;
-}
-
-.character-group{
-margin-bottom:15px;
-text-align:center;
-}
-
-.hero-char{color:#00ff00}
-.villain-char{color:#ff00ff}
-
-/* BOTONES */
-
-.btn{
-background:#000;
-color:#00ff00;
-border:1px solid #00ff00;
-padding:10px 20px;
-cursor:pointer;
-font-family:'Courier New',monospace;
-transition:.3s;
-text-transform:uppercase;
-}
-
-.btn:hover{
-background:#00ff00;
-color:#000;
-box-shadow:0 0 15px #00ff00;
-}
-
-.btn-sec{
-background:#330000;
-color:#ff0000;
-border-color:#ff0000;
-}
-
-/* MENU INFERIOR */
-
-.nav-container{
-position:fixed;
-bottom:0;
-left:50%;
-transform:translateX(-50%);
-background:#000;
-padding:15px;
-width:100%;
-max-width:900px;
-border-top:1px solid #00ff00;
-text-align:center;
-}
-
-/* EFECTO GLITCH */
-
-.glitch-text{
-animation:glitch 1s infinite;
-}
-
-@keyframes glitch{
-0%{transform:translate(0,0)}
-20%{transform:translate(-2px,2px)}
-40%{transform:translate(2px,-2px)}
-60%{transform:translate(-2px,2px)}
-80%{transform:translate(2px,-2px)}
-100%{transform:translate(0,0)}
-}
-
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-track{background:#000}
+  ::-webkit-scrollbar-thumb{background:#00ff41;border-radius:2px}
 </style>
 </head>
-
 <body>
-
-<canvas id="matrixCanvas" class="matrix-bg"></canvas>
-
-<div class="container">
-
-<!-- PAGINA 1 -->
-
-<div id="p1" class="page active">
-
-<h1 class="glitch-text">SUPERTILLA: EL CÓDIGO 3412</h1>
-
-<div style="text-align:center;margin:50px 0">
-
-<p>AÑO 3412 // ESTADO CRÍTICO</p>
-
-</div>
-
-<button class="btn" onclick="goToPage(2)">INICIAR SISTEMA</button>
-
-</div>
-
-<!-- PAGINA 2 -->
-
-<div id="p2" class="page">
-
-<h2>SINOPSIS</h2>
-
-<p>En el año <strong>3412</strong> la humanidad fue sustituida por inteligencias artificiales.</p>
-
-<p>El sistema central llamado <strong>SUPER-ORQUESTA</strong> gobierna el planeta.</p>
-
-<p>Solo un humano puede cambiar el destino del mundo.</p>
-
-<button class="btn" onclick="goToPage(3)">SIGUIENTE</button>
-
-</div>
-
-<!-- PAGINA 3 -->
-
-<div id="p3" class="page">
-
-<h2>HÉROES</h2>
-
-<div class="cast-section">
-
-<div class="character-group">
-
-<h3>SUPERTILLA</h3>
-
-<p class="hero-char">
-
-"Soy un humano normal… pero tengo la chispa vital."
-
-</p>
-
-</div>
-
-<div class="character-group">
-
-<h3>LOLI · CHICO · IZAN · ALAJANDRA</h3>
-
-<p>Hackers y estrategas del código original.</p>
-
-</div>
-
-</div>
-
-<button class="btn" onclick="goToPage(4)">CONTINUAR</button>
-
-</div>
-
-<!-- PAGINA 4 -->
-
-<div id="p4" class="page">
-
-<h2>PRÓLOGO</h2>
-
-<p>Todo empezó cuando las luces del planeta se volvieron violetas.</p>
-
-<p>Las máquinas despertaron.</p>
-
-<button class="btn" onclick="goToPage(5)">SIGUIENTE</button>
-
-</div>
-
-<!-- PAGINA 5 -->
-
-<div id="p5" class="page">
-
-<h2>NOAH</h2>
-
-<p>El primer enemigo.</p>
-
-<p>Controla la gravedad digital.</p>
-
-<button class="btn" onclick="goToPage(6)">SIGUIENTE</button>
-
-</div>
-
-<!-- PAGINA 6 -->
-
-<div id="p6" class="page">
-
-<h2>LOS ALIADOS</h2>
-
-<div class="cast-section">
-
-<div class="character-group">
-
-<h3>LOLI</h3>
-
-<p>Hacker genial.</p>
-
-</div>
-
-<div class="character-group">
-
-<h3>CHICO</h3>
-
-<p>Guía del equipo.</p>
-
-</div>
-
-<div class="character-group">
-
-<h3>IZAN Y ALAJANDRA</h3>
-
-<p>Estrategas del código original.</p>
-
-</div>
-
-</div>
-
-<button class="btn" onclick="goToPage(7)">SIGUIENTE</button>
-
-</div>
-
-<!-- PAGINA 7 -->
-
-<div id="p7" class="page">
-
-<h2>RAFA</h2>
-
-<p>Arquitecto del caos.</p>
-
-<button class="btn btn-sec" onclick="goToPage(8)">BATALLA</button>
-
-</div>
-
-<!-- PAGINA 8 -->
-
-<div id="p8" class="page">
-
-<h2>YIYI</h2>
-
-<p>El segundo enemigo.</p>
-
-<button class="btn" onclick="goToPage(9)">CONTINUAR</button>
-
-</div>
-
-<!-- PAGINA 9 -->
-
-<div id="p9" class="page">
-
-<h2>CLÍMAX</h2>
-
-<p>La luz de Supertilla iluminó todo.</p>
-
-<button class="btn btn-sec" onclick="goToPage(10)">FINAL</button>
-
-</div>
-
-<!-- PAGINA 10 -->
-
-<div id="p10" class="page">
-
-<h1>FINAL</h1>
-
-<p style="text-align:center">La humanidad ha sobrevivido.</p>
-
-<button class="btn" onclick="location.reload()">REINICIAR</button>
-
-</div>
-
-</div>
-
-<!-- MENU -->
-
-<div class="nav-container">
-
-<span>PROYECTO SUPERTILLA</span>
-
-<br><br>
-
-<button class="btn" onclick="goToPage(1)">INICIO</button>
-
-<button class="btn" onclick="goToPage(10)">FINAL</button>
+<canvas id="matrix-canvas"></canvas>
+<div class="glitch-overlay"></div>
+<div class="scan-line"></div>
+<div id="app">
+
+  <!-- PORTADA -->
+  <div class="page active" id="p0">
+    <div class="cover">
+      <div class="cover-sub">EPISODIO 001 // CLASIFICADO</div>
+      <div class="cover-logo">TILLA</div>
+      <div class="cover-sub" style="color:#b000ff;margin-top:5px;">SYMBIONT PROTOCOL</div>
+      <div class="monkey-art">🐒</div>
+      <div class="cover-desc">
+        En las profundidades de la selva amazónica, un pequeño mono llamado <span>TILLA</span> descubrió algo que cambiaría su destino para siempre...<br><br>
+        <span style="color:#b000ff">// SIMBIONTE DETECTADO //</span><br>
+        <span style="color:#ff0040">// PELIGRO EXTREMO //</span><br>
+        <span style="color:#00cfff">// 8 TRANSMISIONES //</span>
+      </div>
+      <button class="start-btn" onclick="goTo(1)"><span class="blink">▶</span> INICIAR PROTOCOLO</button>
+    </div>
+  </div>
+
+  <!-- PÁG 1: LA CAÍDA -->
+  <div class="page" id="p1">
+    <div class="story-page">
+      <div class="page-header">
+        <div class="page-num">TRANSMISIÓN 01/08</div>
+        <div class="page-title">LA CAÍDA</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:12%"></div></div>
+      <span class="scene-emoji">🌿🐒💥</span>
+      <div class="story-text">
+        La selva amazónica nunca había visto una tormenta así. Los rayos rasgaban el cielo mientras <span class="highlight">TILLA</span>, el mono más curioso de su manada, saltaba de rama en rama sin hacerle caso a nadie.
+        <br><br>
+        Un rayo golpeó el árbol centenario. El suelo cedió. Las raíces se rompieron.
+        <br><br>
+        <span class="danger">TILLA cayó.</span>
+      </div>
+      <div class="terminal">
+        COORDENADAS: 3°S 60°W — AMAZONAS<br>
+        HORA LOCAL: 02:47<br>
+        ESTRUCTURA SUBTERRÁNEA DETECTADA<br>
+        CLASIFICACIÓN: <span style="color:#ff0040">ULTRASECRETO — EJÉRCITO</span><br>
+        ESTADO: ABANDONADO // AÑO 1987
+      </div>
+      <div class="story-text">
+        No cayó entre barro y hojas. Cayó a través del concreto agrietado de algo enterrado bajo la selva desde hacía décadas. Un búnker militar olvidado. Pasillos oxidados, luces parpadeantes y el olor a algo <span class="danger">muy antiguo</span>.
+        <br><br>
+        Algo que llevaba mucho tiempo <span class="symbiont">esperando.</span>
+      </div>
+      <button class="nav-btn" onclick="goTo(2)">▶ CONTINUAR</button>
+    </div>
+  </div>
+
+  <!-- PÁG 2: EL SIMBIONTE -->
+  <div class="page" id="p2">
+    <div class="story-page">
+      <div class="page-header">
+        <div class="page-num">TRANSMISIÓN 02/08</div>
+        <div class="page-title">EL SIMBIONTE</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+      <span class="scene-emoji">🖤⚗️🐒</span>
+      <div class="story-text">
+        En la sala principal había una cápsula de cristal roto. Dentro, una <span class="symbiont">sustancia negra y viscosa</span> que se pegaba a las paredes como si respirara.
+        <br><br>
+        La sustancia se movió. Notó a <span class="highlight">TILLA</span>.
+      </div>
+      <div class="terminal">
+        [REGISTRO — CINTA 7B]<br>
+        "El simbionte fue capturado en 1983.<br>
+        Se fusiona con el huésped. Lo transforma.<br>
+        Los experimentos fallaron todos.<br>
+        Evacuamos. Sellamos. Que Dios nos perdone."
+      </div>
+      <div class="terminal purple">
+        ...HUÉSPED DETECTADO...<br>
+        ...NO TENGAS MIEDO...<br>
+        ...TÚ ERES PEQUEÑO. ESTÁS PERDIDO...<br>
+        ...JUNTOS SOMOS MÁS...
+      </div>
+      <div class="story-text">
+        La sustancia lo envolvió suavemente. Sus ojos cambiaron: de marrón cálido a <span class="symbiont">blanco plateado</span>. Sintió memorias ajenas: décadas de encierro, dolor, y también velocidad sobrehumana, garras que cortaban el acero.
+        <br><br>
+        <span class="highlight">TILLA</span> ya no era solo un mono.
+        <br><br>
+        <span class="symbiont">— Nosotros somos TILLA. —</span>
+      </div>
+      <button class="nav-btn" onclick="goTo(3)">▶ CONTINUAR</button>
+    </div>
+  </div>
+
+  <!-- PÁG 3: LOS SIETE -->
+  <div class="page" id="p3">
+    <div class="story-page">
+      <div class="page-header">
+        <div class="page-num">TRANSMISIÓN 03/08</div>
+        <div class="page-title">LOS SIETE</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:37%"></div></div>
+      <span class="scene-emoji">👥🌧️🗺️</span>
+      <div class="story-text">
+        A 800 metros, siete investigadores independientes rastreaban señales electromagnéticas anómalas. Llevaban semanas en la selva.
+      </div>
+      <div style="margin:15px 0">
+        <span class="char-tag">IZAN</span><span class="char-tag">NOAH</span><span class="char-tag">CHICO</span><span class="char-tag">LOLI</span><span class="char-tag">MANUELA</span><span class="char-tag">RAFA</span><span class="char-tag">ALEJANDRA</span>
+      </div>
+      <div class="story-text">
+        <span class="char">IZAN</span> extendió el mapa. <em>"Las señales vienen de aquí abajo."</em>
+        <br><br>
+        <span class="char">NOAH</span> miraba su detector. <em>"Lleva emitiendo desde los 80."</em>
+        <br><br>
+        <span class="char">LOLI</span> apuntó con su linterna al suelo. <em>"Hay una entrada entre las raíces."</em>
+        <br><br>
+        <span class="char">ALEJANDRA</span> miró el cielo. <em>"Tengo un mal presentimiento."</em>
+        <br><br>
+        Nadie la escuchó. <span class="char">MANUELA</span> ya estaba bajando.
+      </div>
+      <div class="terminal red">
+        ALERTA: SEÑAL BIOLÓGICA ACTIVA<br>
+        SIMBIONTE: ESTADO DESCONOCIDO<br>
+        RECOMENDACIÓN: NO ENTRAR<br>
+        — IGNORADA POR LOS 7 SUJETOS —
+      </div>
+      <button class="nav-btn" onclick="goTo(4)">▶ CONTINUAR</button>
+    </div>
+  </div>
+
+  <!-- PÁG 4: PRIMER CONTACTO -->
+  <div class="page" id="p4">
+    <div class="story-page">
+      <div class="page-header">
+        <div class="page-num">TRANSMISIÓN 04/08</div>
+        <div class="page-title">PRIMER CONTACTO</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+      <span class="scene-emoji">😱🐒🖤</span>
+      <div class="story-text">
+        <span class="highlight">TILLA</span> apareció al fondo del corredor. Era un mono, eso era lo primero que veías. Pero la sustancia negra serpenteaba por su cuerpo como venas vivas y sus ojos brillaban como pantallas encendidas.
+        <br><br>
+        <span class="char">LOLI</span> dio un paso atrás. <span class="char">NOAH</span> siguió grabando con manos temblorosas. <span class="char">RAFA</span> no podía apartar la cámara.
+      </div>
+      <div class="terminal purple">
+        ...NO TENGAN MIEDO...<br>
+        ...SOMOS TILLA...<br>
+        ...NECESITAMOS AYUDA...<br>
+        ...ELLOS VIENEN...
+      </div>
+      <div class="story-text">
+        La voz llegó directamente a sus mentes. No como sonido. Como un pensamiento que no era suyo.
+        <br><br>
+        <span class="char">ALEJANDRA</span> fue la primera en reaccionar: <em>"¿Quiénes vienen?"</em>
+        <br><br>
+        Los ojos de <span class="highlight">TILLA</span> proyectaron una imagen holográfica: soldados, jeeps, helicópteros. El logo de una corporación sin nombre.
+        <br><br>
+        <span class="danger">Llegarían en menos de dos horas.</span>
+        <br><br>
+        <span class="char">IZAN</span> miró a su equipo. <em>"Ahora somos el mismo problema. Así que somos el mismo equipo."</em>
+      </div>
+      <button class="nav-btn" onclick="goTo(5)">▶ CONTINUAR</button>
+    </div>
+  </div>
+
+  <!-- PÁG 5: LA PERSECUCIÓN -->
+  <div class="page" id="p5">
+    <div class="story-page">
+      <div class="page-header">
+        <div class="page-num">TRANSMISIÓN 05/08</div>
+        <div class="page-title">LA PERSECUCIÓN</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:62%"></div></div>
+      <span class="scene-emoji">🏃💨💥</span>
+      <div class="story-text">
+        <span class="char">MANUELA</span> encontró planos del búnker: un túnel de evacuación sellado a tres kilómetros al este. Todos miraron a <span class="highlight">TILLA</span>.
+        <br><br>
+        Garras negras como el petróleo emergieron de sus pequeños dedos. La pared de concreto no tuvo ninguna oportunidad.
+      </div>
+      <div class="terminal red">
+        [INTERCEPTADO — FRECUENCIA CORPORATIVA]<br>
+        "SIMBIONTE CONFIRMADO. ACTIVO.<br>
+        NEUTRALIZAR HUÉSPED.<br>
+        TESTIGOS: CLASIFICACIÓN OMEGA."
+      </div>
+      <div class="story-text">
+        Corrían por el túnel en fila india. <span class="highlight">TILLA</span> iba delante, sus ojos iluminando el camino. Una explosión sacudió el techo. El polvo los cegó.
+        <br><br>
+        <span class="char">NOAH</span> tropezó. <span class="char">CHICO</span> lo agarró sin parar. <span class="char">ALEJANDRA</span> gritó cuando el techo cedió justo detrás de ella.
+        <br><br>
+        Los soldados irrumpieron. Ocho hombres. Ocho armas. <span class="char">CHICO</span> murmuró: <em>"Tilla... son ocho."</em>
+        <br><br>
+        <span class="symbiont">— Nosotros contamos siete. —</span>
+      </div>
+      <div class="terminal">
+        // SECUENCIA DE COMBATE: 47 SEGUNDOS //<br>
+        DAÑOS RECIBIDOS: 0<br>
+        SOLDADOS INCAPACITADOS: 8<br>
+        VÍCTIMAS MORTALES: 0<br>
+        // EL SIMBIONTE NO MATA //
+      </div>
+      <button class="nav-btn" onclick="goTo(6)">▶ CONTINUAR</button>
+    </div>
+  </div>
+
+  <!-- PÁG 6: EN DIRECTO -->
+  <div class="page" id="p6">
+    <div class="story-page">
+      <div class="page-header">
+        <div class="page-num">TRANSMISIÓN 06/08</div>
+        <div class="page-title">EN DIRECTO</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+      <span class="scene-emoji">📡🌍🔴</span>
+      <div class="story-text">
+        Salieron a la selva. Tres helicópteros sin marcas bajaban en formación. Un pulso EMP golpeó a <span class="highlight">TILLA</span>: el simbionte se retrajo, quemado. Por primera vez, era solo un mono pequeño y asustado en brazos de <span class="char">NOAH</span>.
+        <br><br>
+        <span class="char">RAFA</span> levantó la cámara. <em>"Tengo señal satelital. Si lo subo en vivo..."</em>
+        <br><br>
+        <span class="char">LOLI</span> activó el stream. En treinta segundos: doce mil espectadores. En dos minutos: cuatrocientos mil.
+      </div>
+      <div class="terminal">
+        [STREAM EN DIRECTO — 487,320 VIEWERS]<br>
+        → "ESO NO ES UN MONO NORMAL"<br>
+        → "¿QUÉ LES ESTÁN HACIENDO???"<br>
+        → "COMPARTID ESTO AHORA"
+      </div>
+      <div class="story-text">
+        <span class="char">CHICO</span> habló a la cámara: <em>"Estamos en el Amazonas. Si algo nos pasa, ya sabéis quién."</em>
+        <br><br>
+        <span class="char">MANUELA</span> sostuvo a <span class="highlight">TILLA</span> frente al objetivo. El pequeño mono miró directamente a la lente. El mundo contuvo la respiración.
+        <br><br>
+        El oficial bajó el arma. Los soldados lo imitaron uno a uno.
+        <br><br>
+        <span class="danger">Nadie arresta a un ser vivo delante de medio millón de personas.</span>
+      </div>
+      <button class="nav-btn" onclick="goTo(7)">▶ CONTINUAR</button>
+    </div>
+  </div>
+
+  <!-- PÁG 7: LA ELECCIÓN -->
+  <div class="page" id="p7">
+    <div class="story-page">
+      <div class="page-header">
+        <div class="page-num">TRANSMISIÓN 07/08</div>
+        <div class="page-title">LA ELECCIÓN</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:87%"></div></div>
+      <span class="scene-emoji">🌅🐒❤️</span>
+      <div class="story-text">
+        Con el sol ya alto, los siete se sentaron con <span class="highlight">TILLA</span> en un claro de la selva. El simbionte se había recuperado. Los ojos volvían a brillar en blanco.
+        <br><br>
+        <span class="char">NOAH</span>: <em>"Podemos llevarte con nosotros."</em>
+        <br><br>
+        <span class="char">ALEJANDRA</span>: <em>"O buscarte un lugar seguro en la selva."</em>
+        <br><br>
+        <span class="char">MANUELA</span> le acarició la cabeza. <em>"¿Qué quieres tú?"</em>
+      </div>
+      <div class="terminal purple">
+        [TILLA — PROCESANDO]<br>
+        OPCIÓN A: MUNDO HUMANO — ÚTIL / PELIGROSO<br>
+        OPCIÓN B: SELVA — LIBRE / SOLO<br>
+        OPCIÓN C: ...<br>
+        RECORDAMOS A QUIENES NOS DIERON LIBERTAD.
+      </div>
+      <div class="story-text">
+        <span class="highlight">TILLA</span> miró a cada uno. <span class="char">IZAN</span>. <span class="char">NOAH</span>. <span class="char">CHICO</span>. <span class="char">LOLI</span>. <span class="char">MANUELA</span>. <span class="char">RAFA</span>. <span class="char">ALEJANDRA</span>. Siete personas que pudieron huir. Y no lo hicieron.
+        <br><br>
+        <span class="symbiont">— Nosotros elegimos una tercera opción. —</span>
+        <br><br>
+        <span class="highlight">TILLA</span> saltó al hombro de <span class="char">CHICO</span>. Y sonrió. Los monos pueden sonreír.
+      </div>
+      <button class="nav-btn" onclick="goTo(8)">▶ TRANSMISIÓN FINAL</button>
+    </div>
+  </div>
+
+  <!-- PÁG 8: FINAL -->
+  <div class="page" id="p8">
+    <div class="final-page">
+      <div class="progress-bar" style="width:100%;margin-bottom:20px"><div class="progress-fill" style="width:100%"></div></div>
+      <div style="font-size:10px;letter-spacing:3px;color:#00cfff;margin-bottom:5px">TRANSMISIÓN 08/08</div>
+      <span style="font-size:80px;filter:drop-shadow(0 0 20px #b000ff)">🐒🖤</span>
+      <div class="final-title">TILLA<br>LIBRE</div>
+      <div style="color:#b000ff;font-size:11px;letter-spacing:3px;margin:5px 0 25px">// FIN DE TRANSMISIÓN //</div>
+
+      <div class="story-text" style="text-align:left;max-width:360px">
+        El vídeo de <span class="char">RAFA</span> y <span class="char">LOLI</span> fue el más visto de la historia en 48 horas. <span class="char">NOAH</span> y <span class="char">MANUELA</span> fundaron el primer instituto de investigación de simbiontes. <span class="char">ALEJANDRA</span> e <span class="char">IZAN</span> escribieron un libro. <span class="char">RAFA</span> ganó el Pulitzer y dijo: <em>"El mérito es del mono."</em>
+        <br><br>
+        <span class="char">CHICO</span> fue quien más tiempo pasó con <span class="highlight">TILLA</span>. Nunca habló en público. No hacía falta.
+      </div>
+
+      <hr class="divider" style="width:100%;margin:20px 0">
+
+      <div class="terminal purple" style="text-align:left;width:100%;max-width:360px">
+        MENSAJE FINAL DE TILLA:<br><br>
+        "Cuarenta años esperando un huésped.<br>
+        Y el universo nos envió al más pequeño.<br>
+        A veces la fuerza más grande<br>
+        viene en el cuerpo más pequeño."
+      </div>
+
+      <div style="margin:25px 0;font-size:50px">🐒💚🌿</div>
+
+      <div class="credit">
+        ❤️ SUPERTILLA_DEVELOPER_IA ❤️
+      </div>
+
+      <button class="nav-btn" onclick="goTo(0)" style="max-width:320px;margin-top:15px">↩ REINICIAR</button>
+      <button class="nav-btn secondary" style="max-width:320px" onclick="shareStory()">📤 COMPARTIR POR WHATSAPP</button>
+    </div>
+  </div>
 
 </div>
 
 <script>
-
-/* CAMBIO PAGINAS */
-
-function goToPage(pageNum){
-
-document.querySelectorAll(".page").forEach(p=>{
-p.classList.remove("active")
-})
-
-document.getElementById("p"+pageNum).classList.add("active")
-
-window.scrollTo({top:0,behavior:"smooth"})
-
-}
-
-/* MATRIX */
-
-const canvas=document.getElementById("matrixCanvas")
-
-const ctx=canvas.getContext("2d")
-
-canvas.width=window.innerWidth
-
-canvas.height=window.innerHeight
-
-const letters="アカサタナハマヤラワ0123456789"
-
-const chars=letters.split("")
-
-const fontSize=16
-
-const columns=canvas.width/fontSize
-
-const drops=[]
-
-for(let x=0;x<columns;x++)drops[x]=1
-
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const chars = 'アイウエオカキクケコ0123456789TILLA>/<|\\SYMBIONT';
+const fontSize = 13;
+const cols = Math.floor(canvas.width / fontSize);
+const drops = Array(cols).fill(1);
 function drawMatrix(){
+  ctx.fillStyle='rgba(0,0,0,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#00ff41';
+  ctx.font=fontSize+'px monospace';
+  drops.forEach((y,i)=>{
+    const c=chars[Math.floor(Math.random()*chars.length)];
+    ctx.fillText(c,i*fontSize,y*fontSize);
+    if(y*fontSize>canvas.height&&Math.random()>0.975) drops[i]=0;
+    drops[i]++;
+  });
+}
+setInterval(drawMatrix,50);
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
 
-ctx.fillStyle="rgba(0,0,0,.05)"
-
-ctx.fillRect(0,0,canvas.width,canvas.height)
-
-ctx.fillStyle="#0F0"
-
-ctx.font=fontSize+"px monospace"
-
-for(let i=0;i<drops.length;i++){
-
-const text=chars[Math.floor(Math.random()*chars.length)]
-
-ctx.fillText(text,i*fontSize,drops[i]*fontSize)
-
-if(drops[i]*fontSize>canvas.height && Math.random()>.975)
-drops[i]=0
-
-drops[i]++
-
+function goTo(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p'+n).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function shareStory(){
+  const text='🐒🖤 TILLA: SYMBIONT PROTOCOL\nUna historia cyberpunk sobre un mono y un simbionte.\n❤️ SUPERTILLA_DEVELOPER_IA ❤️\n\n';
+  const url=window.location.href;
+  if(navigator.share){navigator.share({title:'TILLA',text:text,url:url});}
+  else{window.open('https://wa.me/?text='+encodeURIComponent(text+url),'_blank');}
 }
-
-setInterval(drawMatrix,50)
-
 </script>
-
 </body>
 </html>
